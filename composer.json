@@ -1,0 +1,26 @@
+{
+    "name": "catatsumuri/http-download",
+    "description": "PEAR HTTP_Download, HTTP_Header and HTTP packaged for Composer, unchanged except for the few lines listed in NOTICE.md",
+    "type": "library",
+    "keywords": ["pear", "http", "download", "http_download", "http_header", "range", "etag"],
+    "homepage": "https://github.com/catatsumuri/http-download",
+    "license": "BSD-3-Clause",
+    "authors": [
+        {"name": "Michael Wallner", "role": "Original author (PEAR HTTP_Download, HTTP_Header, HTTP)"},
+        {"name": "Philippe Jausions", "role": "Original author (PEAR HTTP_Download, HTTP)"},
+        {"name": "Wolfram Kriesing", "role": "Original author (PEAR HTTP_Header)"},
+        {"name": "Davey Shafik", "role": "Original author (PEAR HTTP_Header)"},
+        {"name": "catatsumuri", "email": "catatsumuri@gmail.com", "role": "Composer packaging"}
+    ],
+    "require": {
+        "php": ">=5.6",
+        "pear/pear-core-minimal": "^1.10.18"
+    },
+    "suggest": {
+        "pear/archive_tar": "Needed only for HTTP_Download_Archive (tar, tgz, tbz)"
+    },
+    "autoload": {
+        "classmap": ["src/"]
+    },
+    "include-path": ["src/"]
+}

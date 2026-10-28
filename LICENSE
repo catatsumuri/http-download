@@ -1,0 +1,13 @@
+This repository redistributes three PEAR packages. Each of them is released
+under the 3-clause BSD license, with its own copyright holders. The license
+texts shipped with the original packages are kept in licenses/, and the
+copyright notice in every source file is unchanged.
+
+  HTTP_Download  licenses/HTTP_Download.LICENSE
+  HTTP_Header    licenses/HTTP_Header.LICENSE
+  HTTP           no license file in the original package; the source header
+                 states "New BSD License" (2002-2008 The Authors)
+
+The few lines changed from the originals (see NOTICE.md) and the files that
+were added (README.md, NOTICE.md, composer.json, tests/) are offered under the
+same BSD 3-clause terms.
