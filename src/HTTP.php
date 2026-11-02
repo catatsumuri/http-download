@@ -44,9 +44,7 @@
 class HTTP
 {
     /**
-     * Formats a RFC compliant GMT date HTTP header.  This function honors the
-     * "y2k_compliance" php.ini directive and formats the GMT date corresponding
-     * to either RFC850 or RFC822.
+     * Formats a RFC850 GMT date HTTP header.
      *
      * @param mixed $time unix timestamp or date (default = current time)
      *
@@ -54,7 +52,7 @@ class HTTP
      * @access public
      * @static
      */
-    function Date($time = null)
+    static function Date($time = null)
     {
         if (!isset($time)) {
             $time = time();
@@ -63,7 +61,7 @@ class HTTP
         }
 
         // RFC822 or RFC850
-        $format = ini_get('y2k_compliance') ? 'D, d M Y' : 'l, d-M-y';
+        $format = 'l, d-M-y';
 
         return gmdate($format .' H:i:s \G\M\T', $time);
     }
@@ -101,7 +99,7 @@ class HTTP
      * @static
      * @access public
      */
-    function negotiateLanguage($supported, $default = 'en-US')
+    static function negotiateLanguage($supported, $default = 'en-US')
     {
         $supp = array();
         foreach ($supported as $lang => $isSupported) {
@@ -157,7 +155,7 @@ class HTTP
      * @access public
      * @since  1.4.1
      */
-    function negotiateCharset($supported, $default = 'ISO-8859-1')
+    static function negotiateCharset($supported, $default = 'ISO-8859-1')
     {
         $supp = array();
         foreach ($supported as $charset) {
@@ -206,7 +204,7 @@ class HTTP
      * @access public
      * @since  1.4.1
      */
-    function negotiateMimeType($supported, $default)
+    static function negotiateMimeType($supported, $default)
     {
         $supp = array();
         foreach ($supported as $type) {
@@ -255,7 +253,7 @@ class HTTP
      * @access private
      * @static
      */
-    function _matchAccept($header, $supported)
+    static function _matchAccept($header, $supported)
     {
         $matches = HTTP::_sortAccept($header);
         foreach ($matches as $key => $q) {
@@ -279,7 +277,7 @@ class HTTP
      * @access private
      * @static
      */
-    function _sortAccept($header)
+    static function _sortAccept($header)
     {
         $matches = array();
         foreach (explode(',', $header) as $option) {
@@ -333,7 +331,7 @@ class HTTP
      * @see HTTP_Client::head()
      * @see HTTP_Request
      */
-    function head($url, $timeout = 10)
+    static function head($url, $timeout = 10)
     {
         $p = parse_url($url);
         if (!isset($p['scheme'])) {
@@ -392,7 +390,7 @@ class HTTP
      * @static
      * @access public
      */
-    function redirect($url, $exit = true, $rfc2616 = false)
+    static function redirect($url, $exit = true, $rfc2616 = false)
     {
         if (headers_sent()) {
             return false;
@@ -405,7 +403,7 @@ class HTTP
             && $_SERVER['REQUEST_METHOD'] != 'HEAD') {
             echo '
 <p>Redirecting to: <a href="'.str_replace('"', '%22', $url).'">'
-                 .htmlspecialchars($url).'</a>.</p>
+                 .htmlspecialchars($url, ENT_COMPAT).'</a>.</p>
 <script type="text/javascript">
 //<![CDATA[
 if (location.replace == null) {
@@ -443,7 +441,7 @@ location.replace("'.str_replace('"', '\\"', $url).'");
      * @static
      * @access public
      */
-    function absoluteURI($url = null, $protocol = null, $port = null)
+    static function absoluteURI($url = null, $protocol = null, $port = null)
     {
         // filter CR/LF
         $url = str_replace(array("\r", "\n"), ' ', $url);
@@ -497,12 +495,12 @@ location.replace("'.str_replace('"', '\\"', $url).'");
         } else {
             $uriBase = $uriAll;
         }
-        if (!strlen($url) || $url{0} == '#') {
+        if (!strlen($url) || $url[0] == '#') {
             $url = $uriAll.$url;
-        } elseif ($url{0} == '?') {
+        } elseif ($url[0] == '?') {
             $url = $uriBase.$url;
         }
-        if ($url{0} == '/') {
+        if ($url[0] == '/') {
             return $server . $url;
         }
 
@@ -538,7 +536,7 @@ location.replace("'.str_replace('"', '\\"', $url).'");
      * @static
      * @access protected
      */
-    function raiseError($error = null, $code = null)
+    static function raiseError($error = null, $code = null)
     {
         include_once 'PEAR.php';
         return PEAR::raiseError($error, $code);

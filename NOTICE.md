@@ -36,17 +36,30 @@ that uses it depended on. Line numbers refer to the original files.
 
 4. lines 71, 77, 83, 89, 116: `= &new ...` became `= new ...` (same reason as 1).
 
-## Known issues that are left as they are
+## PHP 5.6 to PHP 8.4 compatibility changes
 
-- The PHP 4 style constructors (`function HTTP_Download()`, `HTTP_Header()`,
-  `HTTP_Header_Cache()`) raise "deprecated constructor" notices on PHP 7.x and no
-  longer act as constructors on PHP 8.
-- `src/HTTP.php` and `src/HTTP/Header.php` use `$string{0}` offsets
-  (deprecated in PHP 7.4, a parse error in PHP 8).
+5. `src/HTTP.php` and `src/HTTP/Header.php`: eight curly-brace string offsets
+   became bracket offsets. `HTTP.php` utility methods and
+   `HTTP_Header::redirect()` were declared static for their existing static
+   callers. `HTTP::redirect()` explicitly uses `ENT_COMPAT` to preserve the
+   pre-PHP-8.1 `htmlspecialchars()` behavior.
+6. `src/HTTP/Download.php`, `src/HTTP/Header.php`, and
+   `src/HTTP/Header/Cache.php`: `__construct()` delegates to each existing
+   PHP 4-style constructor so initialization also runs on PHP 8.
+7. `HTTP_Download::sortChunks()` uses a PHP 5.6-compatible closure instead of
+   the removed `create_function()`. `isRangeRequest()` tests the result of
+   `getRanges()` directly instead of calling `count()` on its string result.
+8. Methods documented and called as static in `HTTP_Download`,
+   `HTTP_Download_Archive` and `HTTP_Download_PgLOB` were declared static.
+9. References to ini settings removed before PHP 5.6 (`y2k_compliance`,
+   `safe_mode`, `mime_magic.magicfile`) were removed. `guessContentType()` now
+   calls `mime_content_type()` when `MIME_Type` is unavailable.
+
+## Remaining limitations
+
 - `HTTP_Download_Archive` needs `Archive_Tar` / `Archive_Zip`, which are not
-  required by this package.
-- `HTTP_Download::sortChunks()` uses `create_function()` (removed in PHP 8). It
-  is never called.
+  required by this package. Its behavior has not been tested across PHP versions.
+- The PostgreSQL LOB path has not been tested across PHP versions.
 
-These are fixed centrally in later releases of this package rather than in each
-application that uses it.
+Changes are made centrally in this package rather than in applications or
+their `vendor/` directories.

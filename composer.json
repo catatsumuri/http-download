@@ -1,6 +1,6 @@
 {
     "name": "catatsumuri/http-download",
-    "description": "PEAR HTTP_Download, HTTP_Header and HTTP packaged for Composer, unchanged except for the few lines listed in NOTICE.md",
+    "description": "PEAR HTTP_Download, HTTP_Header and HTTP packaged for Composer",
     "type": "library",
     "keywords": ["pear", "http", "download", "http_download", "http_header", "range", "etag"],
     "homepage": "https://github.com/catatsumuri/http-download",

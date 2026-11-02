@@ -41,9 +41,36 @@ function get($url, $extra = array())
     return array($body === false ? '' : $body, isset($http_response_header) ? $http_response_header : array());
 }
 
+require $argv[1];
+set_include_path($root.'/src'.PATH_SEPARATOR.get_include_path());
+require_once 'HTTP/Download.php';
+require_once 'HTTP/Header/Cache.php';
+
+$previousProtocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : null;
+$_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
+$header = new HTTP_Header();
+check($header->getHttpVersion() === '1.1', 'HTTP_Header constructor');
+if ($previousProtocol === null) {
+    unset($_SERVER['SERVER_PROTOCOL']);
+} else {
+    $_SERVER['SERVER_PROTOCOL'] = $previousProtocol;
+}
+
+$cache = new HTTP_Header_Cache();
+check($cache->getHeader('Pragma') === 'cache', 'HTTP_Header_Cache constructor');
+$download = new HTTP_Download();
+check($download->HTTP instanceof HTTP_Header, 'HTTP_Download constructor');
+check(is_string(HTTP::Date(0)), 'HTTP static Date');
+$chunks = array(array(3, 4), array(0, 1));
+$download->sortChunks($chunks);
+check($chunks === array(array(0, 1), array(3, 4)), 'range comparator');
+
 $dir = sys_get_temp_dir().'/http-download-smoke-'.uniqid();
 mkdir($dir);
 file_put_contents($dir.'/file.txt', "0123456789\n");
+$mimeProbe = new HTTP_Download(array('file' => $dir.'/file.txt'));
+check(!PEAR::isError($mimeProbe->guessContentType()), 'guessContentType');
+check(isset($mimeProbe->headers['Content-Type']), 'guessed Content-Type');
 file_put_contents($dir.'/router.php', <<<'PHP'
 <?php
 require getenv('SMOKE_AUTOLOAD');

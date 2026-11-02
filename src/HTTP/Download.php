@@ -247,6 +247,11 @@ class HTTP_Download
      *
      * @see HTTP_Download::setContentDisposition()
      */
+    function __construct($params = array())
+    {
+        $this->HTTP_Download($params);
+    }
+
     function HTTP_Download($params = array())
     {
         $this->HTTP = new HTTP_Header;
@@ -611,12 +616,12 @@ class HTTP_Download
      * Guess content type of file
      *
      * First we try to use PEAR::MIME_Type, if installed, to detect the content
-     * type, else we check if ext/mime_magic is loaded and properly configured.
+     * type, else we use mime_content_type() when available.
      *
      * Returns PEAR_Error if:
      *      o if PEAR::MIME_Type failed to detect a proper content type
      *        (HTTP_DOWNLOAD_E_INVALID_CONTENT_TYPE)
-     *      o ext/magic.mime is not installed, or not properly configured
+     *      o mime_content_type() is not available
      *        (HTTP_DOWNLOAD_E_NO_EXT_MMAGIC)
      *      o mime_content_type() couldn't guess content type or returned
      *        a content type considered to be bogus by setContentType()
@@ -640,13 +645,7 @@ class HTTP_Download
         }
         if (!function_exists('mime_content_type')) {
             return PEAR::raiseError(
-                'This feature requires ext/mime_magic!',
-                HTTP_DOWNLOAD_E_NO_EXT_MMAGIC
-            );
-        }
-        if (!is_file(ini_get('mime_magic.magicfile'))) {
-            return PEAR::raiseError(
-                'ext/mime_magic is loaded but not properly configured!',
+                'This feature requires mime_content_type()!',
                 HTTP_DOWNLOAD_E_NO_EXT_MMAGIC
             );
         }
@@ -684,9 +683,7 @@ class HTTP_Download
             );
         }
 
-        if (!ini_get('safe_mode')) {
-            @set_time_limit(0);
-        }
+        @set_time_limit(0);
 
         if ($autoSetContentDisposition &&
             !isset($this->headers['Content-Disposition'])) {
@@ -761,7 +758,7 @@ class HTTP_Download
      * @param   bool    $guess      whether HTTP_Download::guessContentType()
      *                               should be called
      */
-    function staticSend($params, $guess = false)
+    static function staticSend($params, $guess = false)
     {
         $d = new HTTP_Download();
         $e = $d->setParams($params);
@@ -803,7 +800,7 @@ class HTTP_Download
      * @param   string  $add_path   path that should be prepended to the files
      * @param   string  $strip_path path that should be stripped from the files
      */
-    function sendArchive(   $name,
+    static function sendArchive(   $name,
                             $files,
                             $type       = HTTP_DOWNLOAD_TGZ,
                             $add_path   = '',
@@ -1024,16 +1021,16 @@ class HTTP_Download
      */
     function sortChunks(&$chunks)
     {
-        $sortFunc = create_function('$a,$b',
-            'if ($a[0] == $b[0]) {
+        $sortFunc = function ($a, $b) {
+            if ($a[0] == $b[0]) {
                 if ($a[1] == $b[1]) {
                     return 0;
                 }
                 return (($a[1] != "*" && $a[1] < $b[1])
                         || $b[1] == "*") ? -1 : 1;
-             }
-
-             return ($a[0] < $b[0]) ? -1 : 1;');
+            }
+            return ($a[0] < $b[0]) ? -1 : 1;
+        };
 
         usort($chunks, $sortFunc);
     }
@@ -1088,7 +1085,7 @@ class HTTP_Download
      */
     function isRangeRequest()
     {
-        if (!isset($_SERVER['HTTP_RANGE']) || !count($this->getRanges())) {
+        if (!isset($_SERVER['HTTP_RANGE']) || !$this->getRanges()) {
             return false;
         }
         return $this->isValidRange();

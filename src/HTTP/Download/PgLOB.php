@@ -46,7 +46,7 @@ class HTTP_Download_PgLOB
      * @return  bool
      * @param   mixed   $conn
      */
-    function setConnection($conn)
+    static function setConnection($conn)
     {
         if (is_a($conn, 'DB_Common')) {
             $conn = $conn->dbh;
@@ -67,7 +67,7 @@ class HTTP_Download_PgLOB
      * @access  public
      * @return  resource
      */
-    function getConnection()
+    static function getConnection()
     {
         if (is_resource($GLOBALS['_HTTP_Download_PgLOB_Connection'])) {
             return $GLOBALS['_HTTP_Download_PgLOB_Connection'];
@@ -85,7 +85,7 @@ class HTTP_Download_PgLOB
      * @param   int     $loid
      * @param   string  $mode
      */
-    function open($conn, $loid, $mode = 'rb')
+    static function open($conn, $loid, $mode = 'rb')
     {
         HTTP_Download_PgLOB::setConnection($conn);
         return fopen('pglob:///'. $loid, $mode);

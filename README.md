@@ -6,11 +6,12 @@ PEAR's `HTTP_Download`, `HTTP_Header` and `HTTP`, packaged for Composer.
 inline content and answers conditional (`ETag`, `304`) and byte-range
 (`206`, `416`, multipart) requests by itself. These packages are not available on
 Packagist under `pear/…`, and PEAR's own installer is not an option for
-Composer-based applications, so the original source is published here as it was
-released, with the provenance recorded in [NOTICE.md](NOTICE.md).
+Composer-based applications, so the original source and its PHP
+compatibility fixes are maintained with provenance recorded in
+[NOTICE.md](NOTICE.md).
 
-PEAR の HTTP_Download / HTTP_Header / HTTP を、Composer で使えるようにそのまま
-パッケージにしたものです。元のソースとの差分は `NOTICE.md` に全部書いてあります。
+PEAR の HTTP_Download / HTTP_Header / HTTP を Composer パッケージとして保守しています。
+PHP 5.6〜8.4 向けの修正と元のソースとの差分は `NOTICE.md` に記録しています。
 
 ## Install
 
@@ -38,11 +39,13 @@ The API is documented in the original
 
 ## Status
 
-This is a faithful copy of old code (HTTP_Download 1.1.4 is from 2010). The
-smoke test passes on PHP 7.4 (the PHP 4 style constructors raise deprecation
-notices there). The code comes from the PHP 5 era, but this package has not been
-run on PHP 5.6. It is **not PHP 8 compatible**. See "Known issues" in
-[NOTICE.md](NOTICE.md). Fixes are made here, in this package.
+Based on HTTP_Download 1.1.4 (2010), with PHP compatibility fixes. The
+smoke test passes on PHP 5.6.40, 7.4.33 and 8.4.25. The application's 29-case
+HTTP golden master matches on PHP 7.4 and 8.4 after normalizing the built-in
+server's protocol version on PHP 8.4. PHP 5.6 differs on one `If-Range` body
+case, also with the original package. Optional archive and PostgreSQL LOB
+paths have not been exercised. See [NOTICE.md](NOTICE.md) for source changes
+and remaining limitations.
 
 ## Test
 
@@ -52,8 +55,9 @@ php tests/smoke.php /path/to/a/project/vendor/autoload.php
 
 The smoke test starts PHP's built-in web server and checks real HTTP exchanges
 (attachment and inline with a Japanese file name, `ETag`/`304`, `Range`/`206`,
-`416`, a file served with `setFile()`). The autoload file is only needed to find
-`pear/pear-core-minimal`.
+`416`, a file served with `setFile()`). It also checks constructors,
+static helpers, range sorting and MIME type detection. The autoload file is
+only needed to find `pear/pear-core-minimal`.
 
 ## License
 
